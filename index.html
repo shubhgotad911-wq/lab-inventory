@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Computer Lab Inventory Management</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #222;
+}
+
+/* HEADER */
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    font-size: 27px;
+}
+
+header p {
+    margin-top: 6px;
+    color: #dce8f5;
+}
+
+/* MAIN CONTAINER */
+
+.container {
+    width: 94%;
+    max-width: 1400px;
+    margin: 25px auto;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    font-size: 14px;
+    color: #666;
+}
+
+.card h2 {
+    margin-top: 10px;
+    font-size: 28px;
+    color: #173b67;
+}
+
+.card.card-available h2 {
+    color: #16742a;
+}
+
+.card.card-used h2 {
+    color: #0369a1;
+}
+
+.card.card-damage h2 {
+    color: #b45309;
+}
+
+.card.card-not-available h2 {
+    color: #b00000;
+}
+
+/* CONTROLS */
+
+.controls {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.controls input,
+.controls select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.search {
+    flex: 1;
+    min-width: 220px;
+}
+
+/* BUTTON */
+
+button {
+    border: none;
+    padding: 11px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-btn {
+    background: #173b67;
+    color: white;
+}
+
+.add-btn:hover {
+    background: #0f2b4d;
+}
+
+/* TABLE */
+
+.table-container {
+    background: white;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #173b67;
+    color: white;
+    padding: 14px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+td {
+    padding: 13px;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+}
+
+tr:hover {
+    background: #f5f8fc;
+}
+
+.col-avail {
+    color: #16742a;
+    font-weight: bold;
+}
+
+.col-used {
+    color: #0369a1;
+    font-weight: bold;
+}
+
+.col-damage {
+    color: #b45309;
+    font-weight: bold;
+}
+
+.col-not-avail {
+    color: #b00000;
+    font-weight: bold;
+}
+
+/* STATUS */
+
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.available {
+    background: #d9f7df;
+    color: #16742a;
+}
+
+.used-status {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.damage-status {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.out {
+    background: #ffd9d9;
+    color: #b00000;
+}
+
+/* ACTION BUTTONS */
+
+.edit {
+    background: #e5eef9;
+    color: #173b67;
+    margin-right: 5px;
+}
+
+.edit:hover {
+    background: #d0e2f7;
+}
+
+.delete {
+    background: #ffe0e0;
+    color: #b00000;
+}
+
+.delete:hover {
+    background: #f8c8c8;
+}
+
+/* MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    width: 480px;
+    max-width: 92%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #173b67;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-btn {
+    background: #173b67;
+    color: white;
+    flex: 1;
+}
+
+.save-btn:hover {
+    background: #0f2b4d;
+}
+
+.cancel-btn {
+    background: #ddd;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background: #ccc;
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media(max-width: 768px) {
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 500px) {
+    header {
+        padding: 20px;
+    }
+
+    .container {
+        width: 95%;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Computer Lab Inventory Management System</h1>
+    <p>Software-Based Inventory Tracking and Management</p>
+</header>
+
+<div class="container">
+
+    <!-- DASHBOARD -->
+    <div class="dashboard">
+
+        <div class="card">
+            <h3>Total Items</h3>
+            <h2 id="totalItems">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Total Quantity</h3>
+            <h2 id="totalQuantity">0</h2>
+        </div>
+
+        <div class="card card-available">
+            <h3>Stock Available</h3>
+            <h2 id="stockAvailable">0</h2>
+        </div>
+
+        <div class="card card-used">
+            <h3>Used</h3>
+            <h2 id="stockUsed">0</h2>
+        </div>
+
+        <div class="card card-damage">
+            <h3>Damage</h3>
+            <h2 id="stockDamage">0</h2>
+        </div>
+
+        <div class="card card-not-available">
+            <h3>Not Available</h3>
+            <h2 id="stockNotAvailable">0</h2>
+        </div>
+
+    </div>
+
+    <!-- SEARCH AND FILTER -->
+    <div class="controls">
+
+        <input
+            type="text"
+            id="search"
+            class="search"
+            placeholder="Search item, ID or location..."
+            onkeyup="displayInventory()"
+        >
+
+        <select id="category" onchange="displayInventory()">
+            <option value="All">All Categories</option>
+            <option value="Computer">Computer</option>
+            <option value="Input Device">Input Device</option>
+            <option value="Display">Display</option>
+            <option value="Cable">Cable</option>
+            <option value="Networking">Networking</option>
+            <option value="Peripheral">Peripheral</option>
+            <option value="Power">Power</option>
+            <option value="Accessory">Accessory</option>
+            <option value="Storage">Storage</option>
+        </select>
+
+        <button class="add-btn" onclick="openAddModal()">
+            + Add Item
+        </button>
+
+    </div>
+
+    <!-- INVENTORY TABLE -->
+    <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Item Name</th>
+                    <th>Category</th>
+                    <th>Total Qty</th>
+                    <th>Stock Available</th>
+                    <th>Used</th>
+                    <th>Damage</th>
+                    <th>Not Available</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable">
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal" id="itemModal" onclick="if(event.target === this) closeModal()">
+
+    <div class="modal-content">
+
+        <h2 id="modalTitle">Add Inventory Item</h2>
+
+        <div class="form-group">
+            <label>Item ID</label>
+            <input type="text" id="itemId" placeholder="Example: CL016">
+        </div>
+
+        <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="itemName" placeholder="Example: LAN Cable">
+        </div>
+
+        <div class="form-group">
+            <label>Category</label>
+            <select id="itemCategory">
+                <option value="Computer">Computer</option>
+                <option value="Input Device">Input Device</option>
+                <option value="Display">Display</option>
+                <option value="Cable">Cable</option>
+                <option value="Networking">Networking</option>
+                <option value="Peripheral">Peripheral</option>
+                <option value="Power">Power</option>
+                <option value="Accessory">Accessory</option>
+                <option value="Storage">Storage</option>
+            </select>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Stock Available</label>
+                <input type="number" id="itemAvailable" min="0" value="0" oninput="updateTotalQuantityModal()">
+            </div>
+
+            <div class="form-group">
+                <label>Used</label>
+                <input type="number" id="itemUsed" min="0" value="0" oninput="updateTotalQuantityModal()">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Damage</label>
+                <input type="number" id="itemDamage" min="0" value="0" oninput="updateTotalQuantityModal()">
+            </div>
+
+            <div class="form-group">
+                <label>Not Available</label>
+                <input type="number" id="itemNotAvailable" min="0" value="0" oninput="updateTotalQuantityModal()">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Total Quantity (Auto-calculated)</label>
+            <input type="number" id="itemQuantity" readonly style="background: #eef2f7; cursor: not-allowed; font-weight: bold;">
+        </div>
+
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="itemLocation" placeholder="Example: Lab 1">
+        </div>
+
+        <div class="form-buttons">
+            <button class="save-btn" onclick="saveItem()">Save Item</button>
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   INITIAL INVENTORY
+========================= */
+
+let inventory = [
+    {
+        id: "CL001",
+        name: "Desktop Computer",
+        category: "Computer",
+        quantity: 20,
+        available: 16,
+        used: 3,
+        damage: 1,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL002",
+        name: "Monitor",
+        category: "Computer",
+        quantity: 20,
+        available: 17,
+        used: 2,
+        damage: 1,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL003",
+        name: "Keyboard",
+        category: "Input Device",
+        quantity: 25,
+        available: 18,
+        used: 5,
+        damage: 2,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL004",
+        name: "Mouse",
+        category: "Input Device",
+        quantity: 25,
+        available: 20,
+        used: 3,
+        damage: 2,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL005",
+        name: "Projector",
+        category: "Display",
+        quantity: 2,
+        available: 1,
+        used: 1,
+        damage: 0,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL006",
+        name: "HDMI Cable",
+        category: "Cable",
+        quantity: 8,
+        available: 5,
+        used: 2,
+        damage: 1,
+        notAvailable: 0,
+        location: "Store Room"
+    },
+    {
+        id: "CL007",
+        name: "VGA Cable",
+        category: "Cable",
+        quantity: 5,
+        available: 3,
+        used: 1,
+        damage: 1,
+        notAvailable: 0,
+        location: "Store Room"
+    },
+    {
+        id: "CL008",
+        name: "Ethernet Cable",
+        category: "Networking",
+        quantity: 15,
+        available: 10,
+        used: 4,
+        damage: 1,
+        notAvailable: 0,
+        location: "Store Room"
+    },
+    {
+        id: "CL009",
+        name: "Router",
+        category: "Networking",
+        quantity: 3,
+        available: 1,
+        used: 2,
+        damage: 0,
+        notAvailable: 0,
+        location: "Network Room"
+    },
+    {
+        id: "CL010",
+        name: "Network Switch",
+        category: "Networking",
+        quantity: 4,
+        available: 2,
+        used: 2,
+        damage: 0,
+        notAvailable: 0,
+        location: "Network Room"
+    },
+    {
+        id: "CL011",
+        name: "Printer",
+        category: "Peripheral",
+        quantity: 2,
+        available: 1,
+        used: 1,
+        damage: 0,
+        notAvailable: 0,
+        location: "Lab Office"
+    },
+    {
+        id: "CL012",
+        name: "UPS",
+        category: "Power",
+        quantity: 10,
+        available: 7,
+        used: 2,
+        damage: 1,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL013",
+        name: "Headphones",
+        category: "Accessory",
+        quantity: 15,
+        available: 10,
+        used: 3,
+        damage: 2,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL014",
+        name: "Webcam",
+        category: "Accessory",
+        quantity: 8,
+        available: 6,
+        used: 2,
+        damage: 0,
+        notAvailable: 0,
+        location: "Lab 1"
+    },
+    {
+        id: "CL015",
+        name: "Pen Drive",
+        category: "Storage",
+        quantity: 10,
+        available: 7,
+        used: 2,
+        damage: 0,
+        notAvailable: 1,
+        location: "Store Room"
+    }
+];
+
+/* =========================
+   LOAD SAVED DATA & MIGRATE
+========================= */
+
+const savedData = localStorage.getItem("computerLabInventory");
+
+if (savedData) {
+    try {
+        const parsed = JSON.parse(savedData);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            // Check if old schema with 'minimum' exists
+            const isOldSchema = parsed.some(item => item.minimum !== undefined && item.available === undefined);
+            if (isOldSchema) {
+                inventory = parsed.map(item => {
+                    const total = Number(item.quantity) || 0;
+                    const min = Number(item.minimum) || 0;
+                    const avail = Math.max(0, total - min);
+                    return {
+                        id: item.id || "",
+                        name: item.name || "",
+                        category: item.category || "Computer",
+                        quantity: total,
+                        available: avail,
+                        used: Math.min(min, total),
+                        damage: 0,
+                        notAvailable: 0,
+                        location: item.location || ""
+                    };
+                });
+            } else {
+                inventory = parsed.map(item => ({
+                    id: item.id || "",
+                    name: item.name || "",
+                    category: item.category || "Computer",
+                    quantity: Number(item.quantity) || 0,
+                    available: Number(item.available) || 0,
+                    used: Number(item.used) || 0,
+                    damage: Number(item.damage) || 0,
+                    notAvailable: Number(item.notAvailable) || 0,
+                    location: item.location || ""
+                }));
+            }
+        }
+    } catch (e) {
+        console.error("Error loading inventory from storage:", e);
+    }
+}
+
+/* =========================
+   SAVE DATA
+========================= */
+
+function saveData() {
+    localStorage.setItem("computerLabInventory", JSON.stringify(inventory));
+}
+
+/* =========================
+   DISPLAY INVENTORY
+========================= */
+
+function displayInventory() {
+    const table = document.getElementById("inventoryTable");
+    const search = document.getElementById("search").value.toLowerCase().trim();
+    const category = document.getElementById("category").value;
+
+    table.innerHTML = "";
+
+    let filtered = inventory.filter(item => {
+        const matchesSearch =
+            item.name.toLowerCase().includes(search) ||
+            item.id.toLowerCase().includes(search) ||
+            item.location.toLowerCase().includes(search);
+
+        const matchesCategory =
+            category === "All" ||
+            item.category === category;
+
+        return matchesSearch && matchesCategory;
+    });
+
+    if (filtered.length === 0) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="11" style="text-align: center; color: #777; padding: 25px;">
+                    No matching items found.
+                </td>
+            </tr>
+        `;
+        updateDashboard();
+        return;
+    }
+
+    filtered.forEach(item => {
+        let status;
+        let statusClass;
+
+        const avail = Number(item.available) || 0;
+        const used = Number(item.used) || 0;
+        const damage = Number(item.damage) || 0;
+        const notAvail = Number(item.notAvailable) || 0;
+
+        if (avail > 0) {
+            status = "Stock Available";
+            statusClass = "available";
+        } else if (used > 0) {
+            status = "Used";
+            statusClass = "used-status";
+        } else if (damage > 0) {
+            status = "Damage";
+            statusClass = "damage-status";
+        } else {
+            status = "Not Available";
+            statusClass = "out";
+        }
+
+        table.innerHTML += `
+        <tr>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.name}</td>
+            <td>${item.category}</td>
+            <td><strong>${item.quantity}</strong></td>
+            <td class="col-avail">${avail}</td>
+            <td class="col-used">${used}</td>
+            <td class="col-damage">${damage}</td>
+            <td class="col-not-avail">${notAvail}</td>
+            <td>${item.location}</td>
+            <td>
+                <span class="status ${statusClass}">
+                    ${status}
+                </span>
+            </td>
+            <td>
+                <button class="edit" onclick="editItem('${item.id}')">Edit</button>
+                <button class="delete" onclick="deleteItem('${item.id}')">Delete</button>
+            </td>
+        </tr>
+        `;
+    });
+
+    updateDashboard();
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function updateDashboard() {
+    let totalItems = inventory.length;
+
+    let totalQuantity = inventory.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    let totalAvailable = inventory.reduce((sum, item) => sum + Number(item.available || 0), 0);
+    let totalUsed = inventory.reduce((sum, item) => sum + Number(item.used || 0), 0);
+    let totalDamage = inventory.reduce((sum, item) => sum + Number(item.damage || 0), 0);
+    let totalNotAvailable = inventory.reduce((sum, item) => sum + Number(item.notAvailable || 0), 0);
+
+    document.getElementById("totalItems").textContent = totalItems;
+    document.getElementById("totalQuantity").textContent = totalQuantity;
+    document.getElementById("stockAvailable").textContent = totalAvailable;
+    document.getElementById("stockUsed").textContent = totalUsed;
+    document.getElementById("stockDamage").textContent = totalDamage;
+    document.getElementById("stockNotAvailable").textContent = totalNotAvailable;
+}
+
+/* =========================
+   MODAL TOTAL CALCULATION
+========================= */
+
+function updateTotalQuantityModal() {
+    const avail = Number(document.getElementById("itemAvailable").value) || 0;
+    const used = Number(document.getElementById("itemUsed").value) || 0;
+    const damage = Number(document.getElementById("itemDamage").value) || 0;
+    const notAvail = Number(document.getElementById("itemNotAvailable").value) || 0;
+
+    document.getElementById("itemQuantity").value = avail + used + damage + notAvail;
+}
+
+/* =========================
+   OPEN ADD MODAL
+========================= */
+
+let editingId = null;
+
+function openAddModal() {
+    document.getElementById("modalTitle").textContent = "Add Inventory Item";
+    document.getElementById("itemId").value = "";
+    document.getElementById("itemId").disabled = false;
+    document.getElementById("itemName").value = "";
+    document.getElementById("itemCategory").value = "Computer";
+    document.getElementById("itemAvailable").value = "0";
+    document.getElementById("itemUsed").value = "0";
+    document.getElementById("itemDamage").value = "0";
+    document.getElementById("itemNotAvailable").value = "0";
+    document.getElementById("itemQuantity").value = "0";
+    document.getElementById("itemLocation").value = "";
+
+    document.getElementById("itemModal").style.display = "flex";
+    editingId = null;
+}
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal() {
+    document.getElementById("itemModal").style.display = "none";
+}
+
+/* =========================
+   EDIT ITEM
+========================= */
+
+function editItem(id) {
+    const item = inventory.find(item => item.id === id);
+    if (!item) return;
+
+    editingId = id;
+
+    document.getElementById("modalTitle").textContent = "Edit Inventory Item";
+    document.getElementById("itemId").value = item.id;
+    document.getElementById("itemId").disabled = true;
+    document.getElementById("itemName").value = item.name;
+    document.getElementById("itemCategory").value = item.category;
+    document.getElementById("itemAvailable").value = item.available !== undefined ? item.available : 0;
+    document.getElementById("itemUsed").value = item.used !== undefined ? item.used : 0;
+    document.getElementById("itemDamage").value = item.damage !== undefined ? item.damage : 0;
+    document.getElementById("itemNotAvailable").value = item.notAvailable !== undefined ? item.notAvailable : 0;
+    document.getElementById("itemQuantity").value = item.quantity;
+    document.getElementById("itemLocation").value = item.location;
+
+    document.getElementById("itemModal").style.display = "flex";
+}
+
+/* =========================
+   SAVE ITEM
+========================= */
+
+function saveItem() {
+    const id = document.getElementById("itemId").value.trim();
+    const name = document.getElementById("itemName").value.trim();
+    const category = document.getElementById("itemCategory").value;
+    const available = Number(document.getElementById("itemAvailable").value);
+    const used = Number(document.getElementById("itemUsed").value);
+    const damage = Number(document.getElementById("itemDamage").value);
+    const notAvailable = Number(document.getElementById("itemNotAvailable").value);
+    const location = document.getElementById("itemLocation").value.trim();
+
+    if (
+        !id ||
+        !name ||
+        location === "" ||
+        isNaN(available) || available < 0 ||
+        isNaN(used) || used < 0 ||
+        isNaN(damage) || damage < 0 ||
+        isNaN(notAvailable) || notAvailable < 0
+    ) {
+        alert("Please fill all fields with valid non-negative numbers.");
+        return;
+    }
+
+    const quantity = available + used + damage + notAvailable;
+
+    const itemData = {
+        id,
+        name,
+        category,
+        quantity,
+        available,
+        used,
+        damage,
+        notAvailable,
+        location
+    };
+
+    if (editingId) {
+        const index = inventory.findIndex(item => item.id === editingId);
+        if (index !== -1) {
+            inventory[index] = itemData;
+        }
+    } else {
+        const exists = inventory.some(item => item.id.toLowerCase() === id.toLowerCase());
+        if (exists) {
+            alert("Item ID already exists. Please choose a unique ID.");
+            return;
+        }
+        inventory.push(itemData);
+    }
+
+    saveData();
+    displayInventory();
+    closeModal();
+}
+
+/* =========================
+   DELETE ITEM
+========================= */
+
+function deleteItem(id) {
+    const item = inventory.find(item => item.id === id);
+    if (!item) return;
+
+    const confirmation = confirm("Are you sure you want to delete '" + item.name + "' (" + item.id + ") from inventory?");
+
+    if (confirmation) {
+        inventory = inventory.filter(item => item.id !== id);
+        saveData();
+        displayInventory();
+    }
+}
+
+/* =========================
+   START WEBSITE
+========================= */
+
+displayInventory();
+
+</script>
+
+</body>
+</html>
